@@ -20,15 +20,19 @@ const getSumLossForEachTrade = (lossForEachTrade) => {
 }
 
 const checkLossLimit = (sumValue, orders) => {
+  sendMsg(`Loss limit is ${LOSS_LIMIT} , sumValue is sumValue`);
   if(sumValue <= LOSS_LIMIT) {
       /* square off positions if limit is reached */
     shouldWait = true;
+    sendMsg('squaring off positions');
     squareOffPositions(orders)
   }
 }
 
 const sendMsg = (msg) => {
-   axios({url: `https://api.telegram.org/bot${process.env.TELE_BOT_TOKEN}/sendMessage?chat_id=${process.env.TELE_CHAT_ID}&text=${msg}`})
+    const url = `https://api.telegram.org/bot${process.env.TELE_BOT_TOKEN}/sendMessage?chat_id=${process.env.TELE_CHAT_ID}&text=${msg}`;
+    console.log('url',url);
+   axios({url: url})
 }
 
 const breakQuantityAndPlaceOrder = (order) => {
@@ -43,6 +47,7 @@ const breakQuantityAndPlaceOrder = (order) => {
             placeOrderWithDelay(order,quantity,250);
             quantity = 0;
             shouldWait = false;
+            sendMsg('quantity is now 0');
         }
     }
 }
@@ -78,8 +83,11 @@ const placeOrder = (order, quantity) => {
     data : data
   };
 
+  sendMsg('placing order');
+
   axios(config).then(function (response) {
     console.log(JSON.stringify(response.data));
+    sendMsg('Order placed Successfully');
   }).catch(function (error) {
     console.log(error);
   }
@@ -103,9 +111,11 @@ const getPositions = () => {
         }
     };
 
+    sendMsg('getting positions');
+
     axios(config).then(function (response) {
        const responseData = response.data['Success'];
-       console.log('ticks');
+       sendMsg('got postions');
        const maxQuantityNonZero = responseData.filter(item => item.netTrdQtyLot !=0);
        const lossForEachTrade = getLossForEachTrade(maxQuantityNonZero);
        const sumLossForEachTrade = getSumLossForEachTrade(lossForEachTrade);
@@ -118,20 +128,19 @@ const getPositions = () => {
 
 const init = async () => {
 
-   let loginResponse = await login();
-   // console.log('loginResponse', loginResponse);
-   const ott = loginResponse.Success.oneTimeToken;
-   console.log('ott', ott);
-   let sessionTokenResponse = await getSessionToken(ott);
-   SESSION_TOKEN = sessionTokenResponse && sessionTokenResponse.success.sessionToken;
-   console.log('sessionToken', SESSION_TOKEN);
+   const today = new Date();
 
-   sendMsg('hello from ec2 code');
+   if( !SESSION_TOKEN || !TOKEN_GENERATED_TIMESTAMP || TOKEN_GENERATED_TIMESTAMP.toDateString() !== today.toDateString()) {
+     let loginResponse = await login();
+     const ott = loginResponse.Success.oneTimeToken;
+     let sessionTokenResponse = await getSessionToken(ott);
+     SESSION_TOKEN = sessionTokenResponse && sessionTokenResponse.success.sessionToken;
+     sendMsg('session token generated');
+   }
 
-   if(!shouldWait) {
+   if(!shouldWait && SESSION_TOKEN) {
     getPositionInIntervals(5000);
    }
-   
 };
 
 const getPositionInIntervals = (delay) => {
