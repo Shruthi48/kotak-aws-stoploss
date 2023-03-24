@@ -95,6 +95,7 @@ const squareOffPositions = (orders) => {
 const getPositions = () => {
     const config = {
         method: 'get',
+        url: 'https://ctradeapi.kotaksecurities.com/apim/positions/1.0/positions/open',
         headers: {
           'consumerKey': CONSUMER_KEY,
           'sessionToken': SESSION_TOKEN,
