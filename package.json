@@ -1,0 +1,23 @@
+{
+  "name": "kotak-aws-stoploss",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Shruthi48/kotak-aws-stoploss.git"
+  },
+  "author": "Shruthi H",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Shruthi48/kotak-aws-stoploss/issues"
+  },
+  "homepage": "https://github.com/Shruthi48/kotak-aws-stoploss#readme",
+  "dependencies": {
+    "axios": "^1.3.4",
+    "dotenv": "^16.0.3"
+  }
+}
