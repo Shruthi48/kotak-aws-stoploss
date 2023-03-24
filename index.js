@@ -114,10 +114,13 @@ const getPositions = () => {
 
     axios(config).then(function (response) {
        const responseData = response.data['Success'];
-       console.log('got postions');
+       console.log('got positions');
        const maxQuantityNonZero = responseData.filter(item => item.netTrdQtyLot !=0);
+       console.log('maxQuantityNonZero', maxQuantityNonZero);
        const lossForEachTrade = getLossForEachTrade(maxQuantityNonZero);
+       console.log('lossForEachTrade', lossForEachTrade);
        const sumLossForEachTrade = getSumLossForEachTrade(lossForEachTrade);
+       console.log('sumLossForEachTrade', sumLossForEachTrade);
        checkLossLimit(sumLossForEachTrade,maxQuantityNonZero);
     }).catch(function (error) {
        console.log(error);
