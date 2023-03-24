@@ -20,7 +20,7 @@ const getSumLossForEachTrade = (lossForEachTrade) => {
 }
 
 const checkLossLimit = (sumValue, orders) => {
-  sendMsg(`Loss limit is ${LOSS_LIMIT} , sumValue is sumValue`);
+  console.log(`Loss limit is ${LOSS_LIMIT} , sumValue is ${sumValue}`);
   if(sumValue <= LOSS_LIMIT) {
       /* square off positions if limit is reached */
     shouldWait = true;
@@ -31,7 +31,7 @@ const checkLossLimit = (sumValue, orders) => {
 
 const sendMsg = (msg) => {
     const url = `https://api.telegram.org/bot${process.env.TELE_BOT_TOKEN}/sendMessage?chat_id=${process.env.TELE_CHAT_ID}&text=${msg}`;
-    console.log('url',url);
+    // console.log('url',url);
    axios({url: url})
 }
 
@@ -47,7 +47,7 @@ const breakQuantityAndPlaceOrder = (order) => {
             placeOrderWithDelay(order,quantity,250);
             quantity = 0;
             shouldWait = false;
-            sendMsg('quantity is now 0');
+            console.log('quantity is now 0');
         }
     }
 }
@@ -83,10 +83,9 @@ const placeOrder = (order, quantity) => {
     data : data
   };
 
-  sendMsg('placing order');
+  console.log('placing order');
 
   axios(config).then(function (response) {
-    console.log(JSON.stringify(response.data));
     sendMsg('Order placed Successfully');
   }).catch(function (error) {
     console.log(error);
@@ -111,11 +110,11 @@ const getPositions = () => {
         }
     };
 
-    sendMsg('getting positions');
+    console.log('getting positions');
 
     axios(config).then(function (response) {
        const responseData = response.data['Success'];
-       sendMsg('got postions');
+       console.log('got postions');
        const maxQuantityNonZero = responseData.filter(item => item.netTrdQtyLot !=0);
        const lossForEachTrade = getLossForEachTrade(maxQuantityNonZero);
        const sumLossForEachTrade = getSumLossForEachTrade(lossForEachTrade);
@@ -135,7 +134,7 @@ const init = async () => {
      const ott = loginResponse.Success.oneTimeToken;
      let sessionTokenResponse = await getSessionToken(ott);
      SESSION_TOKEN = sessionTokenResponse && sessionTokenResponse.success.sessionToken;
-     sendMsg('session token generated');
+     console.log('session token generated');
    }
 
    if(!shouldWait && SESSION_TOKEN) {
